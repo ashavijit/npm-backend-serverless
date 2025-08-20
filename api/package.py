@@ -125,3 +125,11 @@ async def get_user_packages(username: str, size: int = 10, from_: int = 0):
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
+
+@app.get("/api/ping")
+async def ping():
+    return {"status": "pong"}
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the NPM Package API"}
