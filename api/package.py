@@ -8,10 +8,24 @@ from typing import Dict, Any, List
 
 app = FastAPI(title="npm-info-vercel")
 
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "*"
+]
+
 # Simple in-memory TTL cache
 CACHE_TTL = int(os.getenv("CACHE_TTL", "60"))  # seconds
 _cache: Dict[str, Dict[str, Any]] = {}
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,          # list of allowed origins
+    allow_credentials=True,
+    allow_methods=["*"],            # allow all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],            # allow all headers
+)
 
 def get_from_cache(key: str):
     ent = _cache.get(key)
