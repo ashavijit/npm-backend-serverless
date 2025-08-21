@@ -1,9 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 import httpx
+import requests
 import os
 import time
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 app = FastAPI(title="npm-info-vercel")
 
@@ -121,6 +122,34 @@ async def get_user_packages(username: str, size: int = 10, from_: int = 0):
     set_cache(key, output)
     return JSONResponse(content=output)
 
+
+@app.get("/api/user/package/downloads/chart")
+async def package_downloads_chart(
+    package: str = Query(..., description="Package name"),
+    range_: str = Query("last-month", alias="range", description="Range: last-day | last-week | last-month or YYYY-MM-DD:YYYY-MM-DD")
+):
+    """
+    Get downloads vs time for a package.
+    Returns array of objects: [{date: 'YYYY-MM-DD', downloads: N}, ...]
+    """
+    key = f"chart:{package}:{range_}"
+    cached = get_from_cache(key)
+    if cached:
+        return JSONResponse(content=cached)
+
+    url = f"https://api.npmjs.org/downloads/range/{range_}/{package}"
+    async with httpx.AsyncClient(timeout=10) as client:
+        r = await client.get(url)
+        if r.status_code == 404:
+            raise HTTPException(status_code=404, detail="Package not found or no downloads")
+        r.raise_for_status()
+        data = r.json()
+
+    downloads_data: List[Dict[str, Any]] = data.get("downloads", [])
+    chart_data = [{"date": d["day"], "downloads": d["downloads"]} for d in downloads_data]
+
+    set_cache(key, chart_data)
+    return JSONResponse(content=chart_data)
 
 @app.get("/api/health")
 async def health():
