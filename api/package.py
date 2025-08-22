@@ -173,6 +173,7 @@ async def health():
 async def ping():
     return {"status": "pong"}
 
+@app.get("/")
 async def root():
     return """
     <html>
@@ -186,4 +187,17 @@ async def root():
         </body>
     </html>
     """
-
+# not found or not implemented routes
+@app.get("/*")
+async def not_found(request: requests.Request):
+   return """
+   <html>
+       <head>
+           <title>404 Not Found</title>
+       </head>
+       <body style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px;">
+           <h1>404 Not Found</h1>
+           <p>The requested resource was not found.</p>
+       </body>
+   </html>
+   """
