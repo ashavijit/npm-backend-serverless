@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse , HTMLResponse
 import httpx
 import requests
 import os
@@ -173,7 +173,7 @@ async def health():
 async def ping():
     return {"status": "pong"}
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
     return """
     <html>
