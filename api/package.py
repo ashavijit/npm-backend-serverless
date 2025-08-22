@@ -173,6 +173,17 @@ async def health():
 async def ping():
     return {"status": "pong"}
 
-@app.get("/")
 async def root():
-    return {"message": "Welcome to the NPM Package API"}
+    return """
+    <html>
+        <head>
+            <title>NPM Package API</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px;">
+            <h1>Welcome to the NPM Package API 🚀</h1>
+            <p>Use the endpoints to explore package details.</p>
+            <p>Example: <code>/api/user/&lt;username&gt;</code></p>
+        </body>
+    </html>
+    """
+
